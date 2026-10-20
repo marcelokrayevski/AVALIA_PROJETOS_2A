@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - AVALIA PROJETOS 2A</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf para geração do relatório em PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+
+    <div class="glow-bg alt"></div>
+
+    <!-- Modal de Autenticação -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-card glass-card">
+            <div class="lock-icon-wrap"><i class="fa-solid fa-shield-halved"></i></div>
+            <h2>Acesso Restrito</h2>
+            <p>Informe a senha da administração para acessar os relatórios e gerenciar projetos.</p>
+            <form onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <input type="password" id="admin-pass" placeholder="Digite a senha..." required autocomplete="off">
+                </div>
+                <p id="auth-error" class="error-msg hidden"><i class="fa-solid fa-triangle-exclamation"></i> Senha incorreta! Tente novamente.</p>
+                <div class="modal-actions">
+                    <a href="index.html" class="btn-secondary">Voltar ao Aluno</a>
+                    <button type="submit" class="btn-primary">Acessar Painel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Conteúdo do Admin (Oculto até autenticação) -->
+    <div id="admin-content" class="hidden">
+        <header class="main-header admin-header">
+            <div class="logo-container">
+                <div class="logo-icon admin-icon"><i class="fa-solid fa-user-gear"></i></div>
+                <div>
+                    <h1>Painel Administrativo</h1>
+                    <p class="subtitle">Gestão da Turma 2A & Relatórios Consolidados</p>
+                </div>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="resetAllEvaluations()" class="btn-danger-outline" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Resetar Tudo
+                </button>
+                <a href="index.html" class="btn-secondary"><i class="fa-solid fa-house"></i> Ir para Avaliação</a>
+                <button onclick="exportReportPDF()" class="btn-accent"><i class="fa-solid fa-file-pdf"></i> Gerar PDF</button>
+            </div>
+        </header>
+
+        <main class="container">
+            
+            <!-- Indicadores Principais -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-users stat-icon"></i>
+                    <div>
+                        <span class="stat-val" id="stat-total-students">37</span>
+                        <span class="stat-lbl">Estudantes Cadastrados</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-square-poll-vertical stat-icon"></i>
+                    <div>
+                        <span class="stat-val" id="stat-total-evals">0</span>
+                        <span class="stat-lbl">Avaliações Recebidas</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-table-cells-large stat-icon"></i>
+                    <div>
+                        <span class="stat-val">7</span>
+                        <span class="stat-lbl">Mesas de Projeto</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegação de Abas -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAdminTab('relatorio')"><i class="fa-solid fa-chart-line"></i> Relatório de Notas & Participação</button>
+                <button class="tab-btn" onclick="switchAdminTab('projetos')"><i class="fa-solid fa-pen-ruler"></i> Gerenciar Projetos das Mesas</button>
+            </div>
+
+            <!-- ABA 1: Relatórios Consolidados -->
+            <section id="tab-relatorio" class="tab-content active">
+                <div id="pdf-report-area" class="pdf-wrapper">
+                    <div class="pdf-header">
+                        <h2>Relatório de Desempenho - Feira de Inovação Turma 2A</h2>
+                        <p>Data de emissão: <span id="pdf-date">--/--/----</span></p>
+                    </div>
+
+                    <!-- Desempenho por Mesa -->
+                    <div class="report-section">
+                        <h3><i class="fa-solid fa-trophy"></i> Desempenho Consolidado por Mesa</h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mesa</th>
+                                        <th>Empresa</th>
+                                        <th>Avaliações Recebidas</th>
+                                        <th>Média Final (0-100)</th>
+                                        <th>Integrantes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-summary-body">
+                                    <!-- Preenchido via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Relatório Individual de Estudantes com Coluna de Ações -->
+                    <div class="report-section margin-top-lg">
+                        <h3><i class="fa-solid fa-user-check"></i> Relatório Individual de Estudantes</h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Estudante</th>
+                                        <th>Mesa de Origem</th>
+                                        <th>Avaliações Realizadas</th>
+                                        <th>Status de Participação</th>
+                                        <th>Nota da Mesa</th>
+                                        <th style="text-align: center;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-summary-body">
+                                    <!-- Preenchido via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA 2: Edição dos Projetos -->
+            <section id="tab-projetos" class="tab-content hidden">
+                <div class="card glass-card">
+                    <h2><i class="fa-solid fa-sliders"></i> Cadastro de Projetos por Mesa</h2>
+                    <p class="card-desc">Cadastre o nome da empresa, dor, solução, storytelling e link do mockup das 7 mesas.</p>
+                    
+                    <div class="table-selector-btns" id="project-edit-tabs">
+                        <!-- Gerado via JS -->
+                    </div>
+
+                    <form id="project-editor-form" onsubmit="saveProjectData(event)" class="margin-top-lg">
+                        <input type="hidden" id="edit-table-id">
+                        
+                        <div class="form-group">
+                            <label for="edit-company-name">Nome da Empresa / Startup:</label>
+                            <input type="text" id="edit-company-name" required placeholder="Ex: EcoTech Soluções">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="edit-pain">Dor Identificada:</label>
+                                <textarea id="edit-pain" rows="3" required placeholder="Descrição da dor do mercado/cliente..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-solution">Solução Proposta (App/Página):</label>
+                                <textarea id="edit-solution" rows="3" required placeholder="Como a tecnologia resolve essa dor..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-story">Storytelling do Projeto:</label>
+                            <textarea id="edit-story" rows="3" placeholder="Resumo da narrativa de apresentação..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-mockup">Link do Protótipo / Mockup (Figma, Canva, URL):</label>
+                            <input type="url" id="edit-mockup" placeholder="https://figma.com/proto/...">
+                        </div>
+
+                        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Salvar Dados da Mesa</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<!-- Firebase SDK v9 (Modo Compatível para Realtime Database) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

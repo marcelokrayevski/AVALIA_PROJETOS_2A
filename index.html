@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVALIA PROJETOS 2A</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="student-body">
+
+    <div class="glow-bg"></div>
+
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="logo-container">
+            <div class="logo-icon"><i class="fa-solid fa-rocket"></i></div>
+            <div>
+                <h1>AVALIA PROJETOS 2A</h1>
+                <p class="subtitle">Feira de Inovação & Empreendedorismo</p>
+            </div>
+        </div>
+        <a href="admin.html" class="btn-admin-link">
+            <i class="fa-solid fa-lock"></i> Painel Admin
+        </a>
+    </header>
+
+    <main class="container">
+        
+        <!-- Passos do Fluxo -->
+        <section id="step-identify" class="card glass-card">
+            <div class="step-badge">Etapa 1 de 2</div>
+            <h2><i class="fa-solid fa-user-astronaut"></i> Identificação do Avaliador</h2>
+            <p class="card-desc">Selecione sua mesa e seu nome na lista para desbloquear o sistema de avaliação.</p>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="select-my-table"><i class="fa-solid fa-table-cells"></i> Sua Mesa de Origem:</label>
+                    <select id="select-my-table" onchange="onTableSelect()">
+                        <option value="">-- Selecione sua mesa --</option>
+                        <option value="1">Mesa 01</option>
+                        <option value="2">Mesa 02</option>
+                        <option value="3">Mesa 03</option>
+                        <option value="4">Mesa 04</option>
+                        <option value="5">Mesa 05</option>
+                        <option value="6">Mesa 06</option>
+                        <option value="7">Mesa 07</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-student"><i class="fa-solid fa-id-card"></i> Quem é você?</label>
+                    <select id="select-student" disabled onchange="onStudentSelect()">
+                        <option value="">-- Escolha primeiro a mesa --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="student-welcome" class="welcome-box hidden">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                    <strong id="welcome-name">---</strong>
+                    <p>Identificação confirmada! Agora selecione a mesa que você está visitando.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Etapa 2: Escolha de Mesa para Avaliar e Formulário -->
+        <section id="step-evaluate" class="card glass-card disabled-card">
+            <div class="step-badge">Etapa 2 de 2</div>
+            <h2><i class="fa-solid fa-pen-to-square"></i> Avaliar Apresentação</h2>
+            
+            <div class="form-group margin-bottom-lg">
+                <label for="select-target-table"><i class="fa-solid fa-bullseye"></i> Mesa que você está assistindo/avaliando agora:</label>
+                <select id="select-target-table" disabled onchange="loadTargetTableDetails()">
+                    <option value="">-- Selecione a mesa para avaliar --</option>
+                </select>
+            </div>
+
+            <!-- Card Informativo do Projeto da Mesa Avaliada -->
+            <div id="project-details-card" class="project-info-card hidden">
+                <div class="project-header">
+                    <span class="table-badge" id="disp-table-badge">Mesa 0</span>
+                    <h3 id="disp-company-name">Nome da Empresa</h3>
+                </div>
+                <div class="project-grid">
+                    <div class="p-item">
+                        <small><i class="fa-solid fa-heart-crack"></i> Dor Identificada</small>
+                        <p id="disp-pain-text">--</p>
+                    </div>
+                    <div class="p-item">
+                        <small><i class="fa-solid fa-lightbulb"></i> Solução Proposta</small>
+                        <p id="disp-solution-text">--</p>
+                    </div>
+                    <div class="p-item full-width">
+                        <small><i class="fa-solid fa-book-open"></i> Storytelling</small>
+                        <p id="disp-story-text">--</p>
+                    </div>
+                    <div class="p-item full-width" id="disp-mockup-container">
+                        <small><i class="fa-solid fa-mobile-screen-button"></i> Link do Mockup / Protótipo</small>
+                        <a href="#" id="disp-mockup-link" target="_blank" rel="noopener">Visualizar Mockup do Projeto <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário com Critérios somando 100 Pontos -->
+            <form id="evaluation-form" onsubmit="handleEvaluationSubmit(event)" class="hidden">
+                <div class="score-header">
+                    <h3>Critérios de Avaliação</h3>
+                    <div class="total-badge">
+                        Sua Nota Total: <span id="live-total-score">0</span> / 100
+                    </div>
+                </div>
+
+                <div class="criteria-list">
+                    
+                    <div class="criterion-card">
+                        <div class="crit-info">
+                            <h4>1. Clareza na Identificação da Dor <span class="max-pt">(Até 20 pts)</span></h4>
+                            <p>A dor/necessidade do cliente está bem mapeada e fundamentada?</p>
+                        </div>
+                        <div class="crit-input-wrap">
+                            <input type="range" id="c1" min="0" max="20" value="0" oninput="calculateTotalScore()">
+                            <span class="crit-val" id="c1-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="criterion-card">
+                        <div class="crit-info">
+                            <h4>2. Viabilidade e Inovação da Solução <span class="max-pt">(Até 20 pts)</span></h4>
+                            <p>O App/Sistema/Página resolve a dor de forma criativa e prática?</p>
+                        </div>
+                        <div class="crit-input-wrap">
+                            <input type="range" id="c2" min="0" max="20" value="0" oninput="calculateTotalScore()">
+                            <span class="crit-val" id="c2-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="criterion-card">
+                        <div class="crit-info">
+                            <h4>3. Estrutura da Marca e Logo <span class="max-pt">(Até 20 pts)</span></h4>
+                            <p>A identidade visual, nome da empresa e logo são profissionais e coerentes?</p>
+                        </div>
+                        <div class="crit-input-wrap">
+                            <input type="range" id="c3" min="0" max="20" value="0" oninput="calculateTotalScore()">
+                            <span class="crit-val" id="c3-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="criterion-card">
+                        <div class="crit-info">
+                            <h4>4. Storytelling e Apresentação <span class="max-pt">(Até 20 pts)</span></h4>
+                            <p>A narrativa prende a atenção e comunica com clareza o valor do projeto?</p>
+                        </div>
+                        <div class="crit-input-wrap">
+                            <input type="range" id="c4" min="0" max="20" value="0" oninput="calculateTotalScore()">
+                            <span class="crit-val" id="c4-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="criterion-card">
+                        <div class="crit-info">
+                            <h4>5. Qualidade do Mockup / Protótipo <span class="max-pt">(Até 20 pts)</span></h4>
+                            <p>O protótipo visual/interativo apresentado reflete com qualidade a solução?</p>
+                        </div>
+                        <div class="crit-input-wrap">
+                            <input type="range" id="c5" min="0" max="20" value="0" oninput="calculateTotalScore()">
+                            <span class="crit-val" id="c5-val">0</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group margin-top-lg">
+                    <label for="eval-feedback"><i class="fa-solid fa-comment-dots"></i> Feedback Construtivo para o Grupo (Opcional):</label>
+                    <textarea id="eval-feedback" rows="3" placeholder="Elogios ou sugestões para a equipe..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary btn-submit">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar Avaliação da Mesa
+                </button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>AVALIA PROJETOS 2A &copy; 2026 - Desenvolvido para a Feira de Inovação Escolar</p>
+    </footer>
+
+<!-- Firebase SDK v9 (Modo Compatível para Realtime Database) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
