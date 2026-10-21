@@ -29,11 +29,11 @@
 
     <main class="container">
         
-        <!-- Passos do Fluxo -->
+        <!-- Etapa 1: Identificação -->
         <section id="step-identify" class="card glass-card">
-            <div class="step-badge">Etapa 1 de 2</div>
-            <h2><i class="fa-solid fa-user-astronaut"></i> Identificação do Avaliador</h2>
-            <p class="card-desc">Selecione sua mesa e seu nome na lista para desbloquear o sistema de avaliação.</p>
+            <div class="step-badge">Etapa 1</div>
+            <h2><i class="fa-solid fa-user-astronaut"></i> Identificação do Estudante</h2>
+            <p class="card-desc">Selecione sua mesa e seu nome para carregar seu painel de avaliação e quiz.</p>
 
             <div class="form-grid">
                 <div class="form-group">
@@ -62,24 +62,35 @@
                 <i class="fa-solid fa-circle-check check-icon"></i>
                 <div>
                     <strong id="welcome-name">---</strong>
-                    <p>Identificação confirmada! Agora selecione a mesa que você está visitando.</p>
+                    <p>Identificação confirmada! Escolha uma das abas abaixo para visualizar as apresentações ou responder ao Quiz.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Etapa 2: Escolha de Mesa para Avaliar e Formulário -->
+        <!-- Navegação entre Modos (Avaliador de Mesa / Quiz) -->
+        <div id="mode-selector-tabs" class="mode-tabs hidden">
+            <button id="tab-btn-eval" class="mode-tab-btn active" onclick="switchStudentMode('eval')">
+                <i class="fa-solid fa-pen-to-square"></i> 1. Apresentações de Mesas
+            </button>
+            <button id="tab-btn-quiz" class="mode-tab-btn" onclick="switchStudentMode('quiz')">
+                <i class="fa-solid fa-brain"></i> 2. Quiz Individual das Mesas (HOJE)
+            </button>
+        </div>
+
+        <!-- MODO 1: Avaliar Apresentação de Mesa (COM BLOQUEIO SE JÁ AVALIADO) -->
         <section id="step-evaluate" class="card glass-card disabled-card">
-            <div class="step-badge">Etapa 2 de 2</div>
-            <h2><i class="fa-solid fa-pen-to-square"></i> Avaliar Apresentação</h2>
+            <div class="step-badge">Parte 1 - Apresentações</div>
+            <h2><i class="fa-solid fa-bullseye"></i> Apresentação do Projeto</h2>
+            <p class="card-desc">Consulte as notas atribuídas às apresentações de cada mesa.</p>
             
             <div class="form-group margin-bottom-lg">
-                <label for="select-target-table"><i class="fa-solid fa-bullseye"></i> Mesa que você está assistindo/avaliando agora:</label>
+                <label for="select-target-table"><i class="fa-solid fa-table-cells"></i> Selecione a mesa:</label>
                 <select id="select-target-table" disabled onchange="loadTargetTableDetails()">
-                    <option value="">-- Selecione a mesa para avaliar --</option>
+                    <option value="">-- Selecione uma mesa --</option>
                 </select>
             </div>
 
-            <!-- Card Informativo do Projeto da Mesa Avaliada -->
+            <!-- Card Informativo -->
             <div id="project-details-card" class="project-info-card hidden">
                 <div class="project-header">
                     <span class="table-badge" id="disp-table-badge">Mesa 0</span>
@@ -99,23 +110,30 @@
                         <p id="disp-story-text">--</p>
                     </div>
                     <div class="p-item full-width" id="disp-mockup-container">
-                        <small><i class="fa-solid fa-mobile-screen-button"></i> Link do Mockup / Protótipo</small>
+                        <small><i class="fa-solid fa-mobile-screen-button"></i> Protótipo / Mockup</small>
                         <a href="#" id="disp-mockup-link" target="_blank" rel="noopener">Visualizar Mockup do Projeto <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                     </div>
                 </div>
             </div>
 
-            <!-- Formulário com Critérios somando 100 Pontos -->
+            <!-- Banner Alerta de Bloqueio -->
+            <div id="already-eval-alert" class="welcome-box hidden" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); margin-bottom: 20px;">
+                <i class="fa-solid fa-lock" style="font-size: 24px; color: #f59e0b;"></i>
+                <div>
+                    <strong style="color: #f59e0b;">Avaliação Preservada e Concluída!</strong>
+                    <p id="already-eval-text">Você já avaliou esta mesa anteriormente. Suas notas foram preservadas e o envio está bloqueado.</p>
+                </div>
+            </div>
+
             <form id="evaluation-form" onsubmit="handleEvaluationSubmit(event)" class="hidden">
                 <div class="score-header">
-                    <h3>Critérios de Avaliação</h3>
+                    <h3>Critérios da Apresentação</h3>
                     <div class="total-badge">
-                        Sua Nota Total: <span id="live-total-score">0</span> / 100
+                        Nota Registrada: <span id="live-total-score">0</span> / 100
                     </div>
                 </div>
 
                 <div class="criteria-list">
-                    
                     <div class="criterion-card">
                         <div class="crit-info">
                             <h4>1. Clareza na Identificação da Dor <span class="max-pt">(Até 20 pts)</span></h4>
@@ -170,18 +188,46 @@
                             <span class="crit-val" id="c5-val">0</span>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="form-group margin-top-lg">
-                    <label for="eval-feedback"><i class="fa-solid fa-comment-dots"></i> Feedback Construtivo para o Grupo (Opcional):</label>
-                    <textarea id="eval-feedback" rows="3" placeholder="Elogios ou sugestões para a equipe..."></textarea>
+                    <label for="eval-feedback"><i class="fa-solid fa-comment-dots"></i> Feedback Construtivo:</label>
+                    <textarea id="eval-feedback" rows="3" placeholder="Feedback registrado..."></textarea>
                 </div>
 
-                <button type="submit" class="btn-primary btn-submit">
-                    <i class="fa-solid fa-paper-plane"></i> Enviar Avaliação da Mesa
+                <button type="submit" id="btn-submit-eval" class="btn-primary btn-submit">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar Avaliação
                 </button>
             </form>
+        </section>
+
+        <!-- MODO 2: Quiz Individual (HOJE) -->
+        <section id="step-quiz" class="card glass-card hidden">
+            <div class="step-badge">Parte 2 - Avaliação Individual de Hoje</div>
+            <h2><i class="fa-solid fa-graduation-cap"></i> Quiz de Compreensão dos Projetos</h2>
+            <p class="card-desc">Responda às questões sobre os projetos das outras mesas. Suas perguntas e alternativas foram ordenadas aleatoriamente.</p>
+
+            <div class="form-group margin-bottom-lg">
+                <label for="select-quiz-table"><i class="fa-solid fa-circle-question"></i> Selecione a Mesa para responder o Quiz:</label>
+                <select id="select-quiz-table" onchange="loadQuizForSelectedTable()">
+                    <option value="">-- Selecione uma mesa --</option>
+                </select>
+            </div>
+
+            <div id="quiz-container" class="hidden">
+                <div class="quiz-status-header">
+                    <h3 id="quiz-table-title">Perguntas da Mesa X</h3>
+                    <span id="quiz-score-preview" class="status-pill">Pendente</span>
+                </div>
+
+                <form id="quiz-form" onsubmit="handleQuizSubmit(event)">
+                    <div id="quiz-questions-list"></div>
+
+                    <button type="submit" id="btn-submit-quiz" class="btn-primary btn-submit margin-top-lg">
+                        <i class="fa-solid fa-check-double"></i> Finalizar e Salvar Respostas
+                    </button>
+                </form>
+            </div>
         </section>
 
     </main>
@@ -190,9 +236,9 @@
         <p>AVALIA PROJETOS 2A &copy; 2026 - Desenvolvido para a Feira de Inovação Escolar</p>
     </footer>
 
-<!-- Firebase SDK v9 (Modo Compatível para Realtime Database) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="script.js"></script>
+    <!-- Firebase SDK v9 (Modo Compatível) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

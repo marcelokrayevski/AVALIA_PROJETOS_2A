@@ -7,7 +7,7 @@
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf para geração do relatório em PDF -->
+    <!-- html2pdf para geração de relatório em PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- Conteúdo do Admin (Oculto até autenticação) -->
+    <!-- Conteúdo do Admin -->
     <div id="admin-content" class="hidden">
         <header class="main-header admin-header">
             <div class="logo-container">
@@ -55,7 +55,6 @@
 
         <main class="container">
             
-            <!-- Indicadores Principais -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fa-solid fa-users stat-icon"></i>
@@ -68,21 +67,20 @@
                     <i class="fa-solid fa-square-poll-vertical stat-icon"></i>
                     <div>
                         <span class="stat-val" id="stat-total-evals">0</span>
-                        <span class="stat-lbl">Avaliações Recebidas</span>
+                        <span class="stat-lbl">Avaliações de Apresentação</span>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <i class="fa-solid fa-table-cells-large stat-icon"></i>
+                    <i class="fa-solid fa-brain stat-icon"></i>
                     <div>
-                        <span class="stat-val">7</span>
-                        <span class="stat-lbl">Mesas de Projeto</span>
+                        <span class="stat-val" id="stat-total-quizzes">0</span>
+                        <span class="stat-lbl">Quizzes Respondidos</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Navegação de Abas -->
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchAdminTab('relatorio')"><i class="fa-solid fa-chart-line"></i> Relatório de Notas & Participação</button>
+                <button class="tab-btn active" onclick="switchAdminTab('relatorio')"><i class="fa-solid fa-chart-line"></i> Relatório de Notas & Média Final</button>
                 <button class="tab-btn" onclick="switchAdminTab('projetos')"><i class="fa-solid fa-pen-ruler"></i> Gerenciar Projetos das Mesas</button>
             </div>
 
@@ -94,9 +92,9 @@
                         <p>Data de emissão: <span id="pdf-date">--/--/----</span></p>
                     </div>
 
-                    <!-- Desempenho por Mesa -->
+                    <!-- Desempenho das Apresentações por Mesa -->
                     <div class="report-section">
-                        <h3><i class="fa-solid fa-trophy"></i> Desempenho Consolidado por Mesa</h3>
+                        <h3><i class="fa-solid fa-trophy"></i> 1. Desempenho de Apresentação por Mesa</h3>
                         <div class="table-responsive">
                             <table class="data-table">
                                 <thead>
@@ -104,7 +102,7 @@
                                         <th>Mesa</th>
                                         <th>Empresa</th>
                                         <th>Avaliações Recebidas</th>
-                                        <th>Média Final (0-100)</th>
+                                        <th>Nota da Apresentação (0-100)</th>
                                         <th>Integrantes</th>
                                     </tr>
                                 </thead>
@@ -115,18 +113,18 @@
                         </div>
                     </div>
 
-                    <!-- Relatório Individual de Estudantes com Coluna de Ações -->
+                    <!-- Relatório Individual dos Estudantes com Média Final -->
                     <div class="report-section margin-top-lg">
-                        <h3><i class="fa-solid fa-user-check"></i> Relatório Individual de Estudantes</h3>
+                        <h3><i class="fa-solid fa-user-check"></i> 2. Consolidação Individual dos Estudantes</h3>
                         <div class="table-responsive">
                             <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Estudante</th>
-                                        <th>Mesa de Origem</th>
-                                        <th>Avaliações Realizadas</th>
-                                        <th>Status de Participação</th>
-                                        <th>Nota da Mesa</th>
+                                        <th>Mesa</th>
+                                        <th>Nota Apresentação (Mesa)</th>
+                                        <th>Nota Quiz (Individual)</th>
+                                        <th>Média Final (0-100)</th>
                                         <th style="text-align: center;">Ações</th>
                                     </tr>
                                 </thead>
@@ -186,9 +184,9 @@
         </main>
     </div>
 
-<!-- Firebase SDK v9 (Modo Compatível para Realtime Database) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="script.js"></script>
+    <!-- Firebase SDK v9 (Modo Compatível para Realtime Database) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
